@@ -108,9 +108,31 @@ bot.on("polling_error", (error) => {
   console.log(error);
 });
 
-const http = require('http');
-const server = http.createServer((req, res) => {
-  res.writeHead(200);
-  res.end('ok');
+var express = require("express");
+var app = express();
+
+app.get("/", function (req, res) {
+  res.send("OK");
 });
-server.listen(3000);
+
+app.get("/decrypt", function (req, res) {
+  const { str } = req.query;
+  if (!str)
+    return res.status(400).send({
+      message: "OKNOTOK",
+    });
+  console.log(str);
+  const apps2app = new APPS2APPCLASS(str);
+  apps2app.encrypted_string = str;
+
+  const decrypt_url = apps2app.decrypt_string();
+
+  if (!decrypt_url) return res.status(400).send();
+  res.send(decrypt_url);
+
+  console.log(req.query.str);
+});
+
+app.listen(3000, function () {
+  console.log("Listening");
+});
